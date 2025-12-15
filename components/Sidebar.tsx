@@ -124,14 +124,19 @@ const Sidebar: React.FC<SidebarProps> = ({
             <div className="p-3 bg-slate-50 rounded-lg border border-slate-100">
                <div className="flex items-center justify-between mb-2">
                  <p className="text-xs font-medium text-slate-500 uppercase tracking-wider">Current Topic</p>
+               </div>
+               <div className="flex items-center justify-between gap-3">
+                 <p className="text-sm font-semibold text-slate-900 leading-tight">{topicName}</p>
                  <button 
                    onClick={onReturnToMenu}
-                   className="text-[10px] font-bold text-blue-600 hover:text-blue-800 hover:underline uppercase tracking-wide"
+                   className="shrink-0 px-3 py-1.5 bg-white border border-slate-200 shadow-sm text-[10px] font-bold text-slate-600 rounded-md hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200 transition-all uppercase tracking-wide flex items-center gap-1"
                  >
-                   Change
+                   <span>Change</span>
+                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-3 h-3">
+                     <path fillRule="evenodd" d="M15.312 11.424a5.5 5.5 0 0 1-9.201 2.466l-.312-.311h2.433a.75.75 0 0 0 0-1.5H3.989a.75.75 0 0 0-.75.75v4.242a.75.75 0 0 0 1.5 0v-2.43l.31.31a7 7 0 0 0 11.712-3.138.75.75 0 0 0-1.449-.39Zm1.23-3.723a.75.75 0 0 0 .219-.53V2.929a.75.75 0 0 0-1.5 0V5.36l-.31-.31A7 7 0 0 0 3.239 8.188a.75.75 0 1 0 1.448.389A5.5 5.5 0 0 1 13.89 6.11l.311.31h-2.432a.75.75 0 0 0 0 1.5h4.243a.75.75 0 0 0 .53-.219Z" clipRule="evenodd" />
+                   </svg>
                  </button>
                </div>
-               <p className="text-sm font-semibold text-slate-900">{topicName}</p>
             </div>
 
             <div className="p-3 bg-slate-50 rounded-lg border border-slate-100">
