@@ -1,5 +1,5 @@
 {
-  "name": "Intellectual Property Law - Dave Conversation",
-  "description": "A streamlined, real-time chat application for legal interviewing practice featuring Dave, powered by Convai API.",
+  "name": "Intellectual Property Law - Convai",
+  "description": "A streamlined, real-time chat application for legal interviewing practice for IP Law and Patent Law, powered by Convai API.",
   "requestFramePermissions": []
 }

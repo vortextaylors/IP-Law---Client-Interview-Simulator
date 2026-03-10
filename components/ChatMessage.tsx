@@ -16,7 +16,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
           shadow-sm transition-all duration-200
           ${isUser 
             ? 'bg-blue-600 text-white rounded-2xl rounded-tr-sm' 
-            : 'bg-white border border-slate-200 text-slate-800 rounded-2xl rounded-tl-sm'
+            : 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-200 rounded-2xl rounded-tl-sm'
           }
         `}
       >
@@ -31,7 +31,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
            <div 
             className={`
               text-[10px] opacity-70 
-              ${isUser ? 'text-blue-100 text-right ml-auto' : 'text-slate-400 text-left'}
+              ${isUser ? 'text-blue-100 text-right ml-auto' : 'text-slate-400 dark:text-slate-500 text-left'}
             `}
           >
             {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}

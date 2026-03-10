@@ -6,13 +6,14 @@ interface SidebarProps {
   characterName: string;
   characterId: string;
   emotionState?: EmotionState | null;
-  topicName: string; // Changed from currentTopic key to display name
-  onReturnToMenu: () => void; // New prop to go back
+  topicName: string; 
+  onReturnToMenu: () => void; 
   onRestart: () => void;
   onFinish: () => void;
   onLoadSession: (id: string) => void;
   isOpen: boolean;
   onClose: () => void;
+  disabled?: boolean;
 }
 
 const Sidebar: React.FC<SidebarProps> = ({ 
@@ -26,40 +27,33 @@ const Sidebar: React.FC<SidebarProps> = ({
   onFinish,
   onLoadSession,
   isOpen,
-  onClose
+  onClose,
+  disabled = false
 }) => {
   const [copiedField, setCopiedField] = useState<string | null>(null);
   const [manualSessionId, setManualSessionId] = useState('');
 
-  // Process emotions for display
   const { dominant, others } = useMemo(() => {
     if (!emotionState) return { dominant: null, others: [] };
-    
-    // Sort emotions by value descending
     const sorted = Object.entries(emotionState)
-      .map(([name, value]) => ({ name, value: Number(value) })) // Ensure value is a number
+      .map(([name, value]) => ({ name, value: Number(value) })) 
       .sort((a, b) => b.value - a.value);
-    
-    // Filter out very low probability emotions (noise)
     const significant = sorted.filter(e => e.value > 0.01);
-
     if (significant.length === 0) return { dominant: null, others: [] };
-
     return {
       dominant: significant[0],
-      others: significant.slice(1, 4) // Next 3 emotions
+      others: significant.slice(1, 4) 
     };
   }, [emotionState]);
 
-  // Helper to determine color based on emotion name
   const getEmotionColor = (emotionName: string) => {
     const name = emotionName.toLowerCase();
-    if (['angry', 'anger', 'annoyed'].some(k => name.includes(k))) return 'text-rose-600 bg-rose-50 border-rose-100';
-    if (['happy', 'joy', 'excited'].some(k => name.includes(k))) return 'text-emerald-600 bg-emerald-50 border-emerald-100';
-    if (['sad', 'grief', 'disappointed'].some(k => name.includes(k))) return 'text-blue-600 bg-blue-50 border-blue-100';
-    if (['fear', 'scared', 'nervous'].some(k => name.includes(k))) return 'text-purple-600 bg-purple-50 border-purple-100';
-    if (['confused', 'puzzled', 'uncertain'].some(k => name.includes(k))) return 'text-amber-600 bg-amber-50 border-amber-100';
-    return 'text-slate-700 bg-slate-50 border-slate-100';
+    if (['angry', 'anger', 'annoyed'].some(k => name.includes(k))) return 'text-rose-600 bg-rose-50 border-rose-100 dark:bg-rose-950/40 dark:text-rose-400 dark:border-rose-900';
+    if (['happy', 'joy', 'excited'].some(k => name.includes(k))) return 'text-emerald-600 bg-emerald-50 border-emerald-100 dark:bg-emerald-950/40 dark:text-emerald-400 dark:border-emerald-900';
+    if (['sad', 'grief', 'disappointed'].some(k => name.includes(k))) return 'text-blue-600 bg-blue-50 border-blue-100 dark:bg-blue-950/40 dark:text-blue-400 dark:border-blue-900';
+    if (['fear', 'scared', 'nervous'].some(k => name.includes(k))) return 'text-purple-600 bg-purple-50 border-purple-100 dark:bg-purple-950/40 dark:text-purple-400 dark:border-purple-900';
+    if (['confused', 'puzzled', 'uncertain'].some(k => name.includes(k))) return 'text-amber-600 bg-amber-50 border-amber-100 dark:bg-amber-950/40 dark:text-amber-400 dark:border-amber-900';
+    return 'text-slate-700 bg-slate-50 border-slate-100 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700';
   };
 
   const handleCopy = (text: string, field: string) => {
@@ -78,7 +72,6 @@ const Sidebar: React.FC<SidebarProps> = ({
 
   return (
     <>
-      {/* Mobile Overlay */}
       <div 
         className={`
           fixed inset-0 bg-black/20 backdrop-blur-sm z-40 md:hidden transition-opacity duration-300
@@ -88,23 +81,20 @@ const Sidebar: React.FC<SidebarProps> = ({
         aria-hidden="true"
       />
 
-      {/* Sidebar Content */}
       <aside 
         className={`
-          w-80 bg-white border-l border-slate-200 flex flex-col h-full shrink-0
+          w-80 bg-white dark:bg-slate-900 border-l border-slate-200 dark:border-slate-800 flex flex-col h-full shrink-0
           fixed inset-y-0 right-0 z-50 shadow-2xl md:shadow-none
           transform transition-transform duration-300 ease-in-out
           md:static md:transform-none md:z-auto
           ${isOpen ? 'translate-x-0' : 'translate-x-full md:translate-x-0'}
         `}
       >
-        {/* Mobile Header with Close Button */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 md:hidden bg-white">
-          <h2 className="font-semibold text-slate-800">Session Menu</h2>
+        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 dark:border-slate-800 md:hidden bg-white dark:bg-slate-900">
+          <h2 className="font-semibold text-slate-800 dark:text-slate-100">Session Menu</h2>
           <button 
             onClick={onClose}
-            className="p-2 -mr-2 text-slate-500 hover:bg-slate-100 rounded-full transition-colors"
-            aria-label="Close menu"
+            className="p-2 -mr-2 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors"
           >
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
               <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
@@ -113,76 +103,48 @@ const Sidebar: React.FC<SidebarProps> = ({
         </div>
 
         <div className="p-6 flex-1 flex flex-col gap-6 overflow-y-auto">
-          
-          {/* Header - Desktop */}
           <div className="hidden md:block">
-            <h2 className="text-lg font-semibold text-slate-800 mb-4">Session Details</h2>
+            <h2 className="text-lg font-semibold text-slate-800 dark:text-slate-100 mb-4">Session Details</h2>
           </div>
           
           <div className="space-y-4">
-            {/* Topic Info */}
-            <div className="p-3 bg-slate-50 rounded-lg border border-slate-100">
+            <div className="p-3 bg-slate-50 dark:bg-slate-800 rounded-lg border border-slate-100 dark:border-slate-700">
                <div className="flex items-center justify-between mb-2">
-                 <p className="text-xs font-medium text-slate-500 uppercase tracking-wider">Current Topic</p>
+                 <p className="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">Current Topic</p>
                </div>
                <div className="flex items-center justify-between gap-3">
-                 <p className="text-sm font-semibold text-slate-900 leading-tight">{topicName}</p>
-                 <button 
-                   onClick={onReturnToMenu}
-                   className="shrink-0 px-3 py-1.5 bg-white border border-slate-200 shadow-sm text-[10px] font-bold text-slate-600 rounded-md hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200 transition-all uppercase tracking-wide flex items-center gap-1"
-                 >
-                   <span>Change</span>
-                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-3 h-3">
-                     <path fillRule="evenodd" d="M15.312 11.424a5.5 5.5 0 0 1-9.201 2.466l-.312-.311h2.433a.75.75 0 0 0 0-1.5H3.989a.75.75 0 0 0-.75.75v4.242a.75.75 0 0 0 1.5 0v-2.43l.31.31a7 7 0 0 0 11.712-3.138.75.75 0 0 0-1.449-.39Zm1.23-3.723a.75.75 0 0 0 .219-.53V2.929a.75.75 0 0 0-1.5 0V5.36l-.31-.31A7 7 0 0 0 3.239 8.188a.75.75 0 1 0 1.448.389A5.5 5.5 0 0 1 13.89 6.11l.311.31h-2.432a.75.75 0 0 0 0 1.5h4.243a.75.75 0 0 0 .53-.219Z" clipRule="evenodd" />
-                   </svg>
-                 </button>
+                 <p className="text-sm font-semibold text-slate-900 dark:text-white leading-tight">{topicName}</p>
+                 {!disabled && (
+                    <button 
+                      onClick={onReturnToMenu}
+                      className="shrink-0 px-3 py-1.5 bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 shadow-sm text-[10px] font-bold text-slate-600 dark:text-slate-200 rounded-md hover:bg-blue-50 dark:hover:bg-slate-600 hover:text-blue-600 hover:border-blue-200 transition-all uppercase tracking-wide flex items-center gap-1"
+                    >
+                      <span>Change</span>
+                    </button>
+                 )}
                </div>
             </div>
 
-            <div className="p-3 bg-slate-50 rounded-lg border border-slate-100">
-              <p className="text-xs font-medium text-slate-500 uppercase tracking-wider mb-1">Character Name</p>
-              <p className="text-sm font-semibold text-slate-800">{characterName}</p>
+            <div className="p-3 bg-slate-50 dark:bg-slate-800 rounded-lg border border-slate-100 dark:border-slate-700">
+              <p className="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">Client Name</p>
+              <p className="text-sm font-semibold text-slate-800 dark:text-slate-200">{characterName}</p>
             </div>
 
-            <div className="p-3 bg-slate-50 rounded-lg border border-slate-100">
-              <p className="text-xs font-medium text-slate-500 uppercase tracking-wider mb-1">Character ID</p>
-              <div className="flex items-center justify-between gap-2">
-                <p className="text-xs font-mono text-slate-600 break-all line-clamp-2">{characterId}</p>
-                <button 
-                  onClick={() => handleCopy(characterId, 'charId')}
-                  className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors shrink-0"
-                  title="Copy Character ID"
-                >
-                  {copiedField === 'charId' ? (
-                    <span className="text-[10px] font-bold text-emerald-600 block animate-pulse">Copied</span>
-                  ) : (
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
-                      <path d="M7 3.5A1.5 1.5 0 0 1 8.5 2h3.879a1.5 1.5 0 0 1 1.06.44l3.122 3.12A1.5 1.5 0 0 1 17 6.622V12.5a1.5 1.5 0 0 1-1.5 1.5h-1v-3.379a3 3 0 0 0-.879-2.121L10.5 5.379A3 3 0 0 0 8.379 4.5H7v-1Z" />
-                      <path d="M4.5 6A1.5 1.5 0 0 0 3 7.5v9A1.5 1.5 0 0 0 4.5 18h7a1.5 1.5 0 0 0 1.5-1.5v-5.879a1.5 1.5 0 0 0-.44-1.06L9.44 6.439A1.5 1.5 0 0 0 8.378 6H4.5Z" />
-                    </svg>
-                  )}
-                </button>
-              </div>
-            </div>
-
-            <div className="p-3 bg-slate-50 rounded-lg border border-slate-100">
+            <div className="p-3 bg-slate-50 dark:bg-slate-800 rounded-lg border border-slate-100 dark:border-slate-700">
               <div className="flex items-center justify-between mb-1">
-                 <p className="text-xs font-medium text-slate-500 uppercase tracking-wider">Session ID</p>
-                 <span className="text-[10px] text-blue-600 font-medium cursor-help" title="Save this ID to resume later">Save this ID</span>
+                 <p className="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">Session ID</p>
               </div>
-              
               <div className="flex items-center justify-between gap-2">
-                <p className="text-xs font-mono text-slate-600 break-all">
+                <p className="text-xs font-mono text-slate-600 dark:text-slate-300 break-all">
                   {sessionId === '-1' ? 'Not Started' : sessionId}
                 </p>
                 {sessionId !== '-1' && (
                   <button 
                     onClick={() => handleCopy(sessionId, 'sessionId')}
-                    className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors shrink-0"
-                    title="Copy Session ID"
+                    className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-slate-700 rounded-md transition-colors shrink-0"
                   >
                     {copiedField === 'sessionId' ? (
-                      <span className="text-[10px] font-bold text-emerald-600 block animate-pulse">Copied</span>
+                      <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 block animate-pulse">Copied</span>
                     ) : (
                       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
                         <path d="M7 3.5A1.5 1.5 0 0 1 8.5 2h3.879a1.5 1.5 0 0 1 1.06.44l3.122 3.12A1.5 1.5 0 0 1 17 6.622V12.5a1.5 1.5 0 0 1-1.5 1.5h-1v-3.379a3 3 0 0 0-.879-2.121L10.5 5.379A3 3 0 0 0 8.379 4.5H7v-1Z" />
@@ -194,44 +156,37 @@ const Sidebar: React.FC<SidebarProps> = ({
               </div>
             </div>
             
-            {/* Load Session */}
-            <div className="p-3 bg-slate-50 rounded-lg border border-slate-100">
-               <p className="text-xs font-medium text-slate-500 uppercase tracking-wider mb-2">Resume Session</p>
-               <div className="flex gap-2">
-                 <input 
-                   type="text" 
-                   value={manualSessionId}
-                   onChange={(e) => setManualSessionId(e.target.value)}
-                   placeholder="Enter Session ID"
-                   className="w-full min-w-0 bg-white border border-slate-200 text-slate-700 px-3 py-1.5 rounded-md text-xs font-mono focus:outline-none focus:ring-1 focus:ring-blue-500/50"
-                 />
-                 <button 
-                   onClick={handleLoadSubmit}
-                   disabled={!manualSessionId.trim()}
-                   className="px-3 py-1.5 bg-white border border-slate-300 text-slate-600 text-xs font-medium rounded-md hover:bg-slate-100 disabled:opacity-50 disabled:cursor-not-allowed"
-                 >
-                   Load
-                 </button>
-               </div>
-            </div>
+            {!disabled && (
+              <div className="p-3 bg-slate-50 dark:bg-slate-800 rounded-lg border border-slate-100 dark:border-slate-700">
+                <p className="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">Resume Session</p>
+                <div className="flex gap-2">
+                  <input 
+                    type="text" 
+                    value={manualSessionId}
+                    onChange={(e) => setManualSessionId(e.target.value)}
+                    placeholder="Enter ID"
+                    className="w-full min-w-0 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-600 text-slate-700 dark:text-slate-200 px-3 py-1.5 rounded-md text-xs font-mono focus:outline-none focus:ring-1 focus:ring-blue-500/50"
+                  />
+                  <button 
+                    onClick={handleLoadSubmit}
+                    disabled={!manualSessionId.trim()}
+                    className="px-3 py-1.5 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 text-slate-600 dark:text-slate-200 text-xs font-medium rounded-md hover:bg-slate-100 dark:hover:bg-slate-600 disabled:opacity-50"
+                  >
+                    Load
+                  </button>
+                </div>
+              </div>
+            )}
 
-            {/* State of Mind - Text Version */}
             {dominant && (
               <div className={`p-4 rounded-xl border ${getEmotionColor(dominant.name)}`}>
-                <div className="flex items-center justify-between mb-2">
-                   <p className="text-xs font-bold uppercase tracking-wider opacity-70">State of Mind</p>
-                </div>
-                
-                <div className="text-2xl font-bold capitalize mb-1">
-                  {dominant.name}
-                </div>
-                
+                <p className="text-xs font-bold uppercase tracking-wider opacity-70 mb-2">State of Mind</p>
+                <div className="text-2xl font-bold capitalize mb-1">{dominant.name}</div>
                 {others.length > 0 && (
-                   <div className="mt-3 pt-3 border-t border-black/5">
-                      <p className="text-[10px] opacity-60 uppercase tracking-wider mb-1">Undertones</p>
+                   <div className="mt-3 pt-3 border-t border-black/5 dark:border-white/10">
                       <div className="flex flex-wrap gap-1.5">
                         {others.map((e) => (
-                          <span key={e.name} className="px-2 py-1 bg-white/50 rounded-md text-xs font-medium capitalize">
+                          <span key={e.name} className="px-2 py-1 bg-white/50 dark:bg-black/20 rounded-md text-xs font-medium capitalize">
                             {e.name}
                           </span>
                         ))}
@@ -242,35 +197,28 @@ const Sidebar: React.FC<SidebarProps> = ({
             )}
           </div>
 
-          {/* Restart Button */}
-          <div className="mt-2">
-            <button
-              onClick={onRestart}
-              className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-white border border-slate-300 text-slate-700 text-sm font-medium rounded-lg hover:bg-slate-50 hover:text-slate-900 transition-colors focus:outline-none focus:ring-2 focus:ring-slate-200"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
-              </svg>
-              Restart Session
-            </button>
-          </div>
+          {!disabled && (
+            <div className="mt-2">
+              <button
+                onClick={onRestart}
+                className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-200 text-sm font-medium rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
+              >
+                Restart Session
+              </button>
+            </div>
+          )}
         </div>
 
-        {/* Footer / Finish Button */}
-        <div className="p-6 border-t border-slate-100 mt-auto bg-slate-50/50">
-          <button
-            onClick={onFinish}
-            className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-slate-900 text-white text-sm font-semibold rounded-xl hover:bg-slate-800 active:transform active:scale-[0.98] transition-all shadow-md hover:shadow-lg"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-            </svg>
-            Finish Conversation
-          </button>
-          <p className="text-[10px] text-center text-slate-400 mt-3">
-            Ends the session and prepares analysis.
-          </p>
-        </div>
+        {!disabled && (
+          <div className="p-6 border-t border-slate-100 dark:border-slate-800 mt-auto bg-slate-50/50 dark:bg-slate-900/50">
+            <button
+              onClick={onFinish}
+              className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-slate-900 dark:bg-blue-600 text-white text-sm font-semibold rounded-xl hover:bg-slate-800 dark:hover:bg-blue-700 transition-all shadow-md"
+            >
+              Finish Conversation
+            </button>
+          </div>
+        )}
       </aside>
     </>
   );

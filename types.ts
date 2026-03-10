@@ -24,12 +24,11 @@ export interface AnalysisMetrics {
   score?: number;
   performanceLevel?: string;
   summary?: string;
-  // Detailed segmented analysis fields
   performanceOverview?: string;
   scoreRationale?: string;
   toneAnalysis?: string;
   issueAddressing?: string;
   improvementSuggestions?: string;
-  // Legacy field (optional)
+  sentiments?: Record<string, 'positive' | 'neutral' | 'negative'>;
   feedback?: string; 
 }
