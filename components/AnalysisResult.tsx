@@ -75,10 +75,21 @@ const ExpandableCard: React.FC<ExpandableCardProps> = ({
         {lines.map((line, index) => {
           const cleanLine = line.replace(/^[•\*-]\s*/, '').trim();
           if (!cleanLine) return null;
+          
+          // Split by quotes to highlight them
+          const parts = cleanLine.split(/(".*?")/g);
+
           return (
             <li key={index} className="flex items-start gap-2.5 md:gap-3 text-slate-700 dark:text-slate-300 leading-relaxed text-xs md:text-sm animate-in fade-in slide-in-from-top-1 duration-200" style={{ animationDelay: `${index * 40}ms` }}>
               <span className={`mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 ${sentiment === 'positive' ? 'bg-emerald-400' : sentiment === 'negative' ? 'bg-rose-400' : 'bg-slate-300 dark:bg-slate-600'}`}></span>
-              <span className="flex-1 text-left">{cleanLine}</span>
+              <span className="flex-1 text-left">
+                {parts.map((part, i) => {
+                  if (part.startsWith('"') && part.endsWith('"')) {
+                    return <span key={i} className="bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-slate-900 dark:text-slate-200 font-medium italic border border-slate-200 dark:border-slate-700">{part}</span>;
+                  }
+                  return <React.Fragment key={i}>{part}</React.Fragment>;
+                })}
+              </span>
             </li>
           );
         })}

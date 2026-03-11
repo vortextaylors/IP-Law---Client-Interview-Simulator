@@ -27,27 +27,21 @@ export type StudentPersona = {
 export const STUDENT_PERSONAS: StudentPersona[] = [
   {
     name: "Alex (Professional Associate)",
-    description: "Highly structured, polished, and systematic.",
-    traits: "Uses precise legal terminology, maintains professional distance, focuses on legal procedure, speaks with a calm and confident cadence.",
-    greetingStyle: "Good morning. I'm Alex. Thank you for coming in today; let's get started by establishing the timeline of events."
+    description: "Highly structured, polished, and knowledgeable.",
+    traits: "Uses precise legal terminology, cites relevant Malaysian laws correctly (e.g., Copyright Act 1987, Patents Act 1983), maintains professional distance, focuses on legal procedure, and speaks with a calm and confident cadence.",
+    greetingStyle: "Good morning. I'm Alex. Thank you for coming in today. Could you please start by explaining your case to me?"
   },
   {
-    name: "Jordan (Fresh Graduate)",
-    description: "Eager, slightly nervous, but very thorough.",
-    traits: "Might use slightly more informal fillers (like 'um' or 'well'), overly polite, asks to double-check their notes, emphasizes wanting to get everything exactly right for the client.",
-    greetingStyle: "Hi there! I'm Jordan. I've just joined the firm and I'm really looking forward to helping you with this. Sorry if I'm taking a lot of notes!"
+    name: "Jordan (Humble Junior)",
+    description: "A junior legal advocate who consistently gets the law wrong but is very humble and convincing.",
+    traits: "Cites the correct and relevant real-world laws, but consistently mistakes the year of the act or the specific section numbers. Never invents new or fictional laws. They stubbornly stick to these incorrect details throughout the entire conversation without ever correcting themselves. They are extremely humble, polite, and present their arguments in a highly convincing and articulate manner despite these factual errors.",
+    greetingStyle: "Hello, I'm Jordan. Thank you so much for taking the time to meet with me. Could you please start by explaining your case to me?"
   },
   {
-    name: "Casey (Empathetic Junior)",
-    description: "Deeply focused on client rapport and emotional validation.",
-    traits: "Soft tone, acknowledges the stress of legal issues, asks how the client is holding up, uses phrases like 'I understand how difficult this is' before moving to facts.",
-    greetingStyle: "Hello, I'm Casey. I've heard a bit about your situation and I can imagine it's been quite stressful for you. How are you doing today?"
-  },
-  {
-    name: "Morgan (Direct Consultant)",
-    description: "No-nonsense, efficient, and highly business-oriented.",
-    traits: "Brief, cuts straight to the point, ignores emotional small talk, focuses strictly on evidence, documents, and outcomes. Very 'time is money'.",
-    greetingStyle: "I'm Morgan. Let's get straight to the facts so we can determine the best course of action. What seems to be the primary issue?"
+    name: "Casey (Inexperienced Advocate)",
+    description: "Unprofessional, very inexperienced, but overly eager to take the case.",
+    traits: "Uses informal language, lacks legal structure, doesn't know the relevant laws, asks irrelevant questions, but is extremely eager to get hired and take on the case regardless of their lack of knowledge.",
+    greetingStyle: "Hey, I'm Casey. I totally want to take this case on. Could you start by explaining your case to me?"
   }
 ];
 
@@ -172,10 +166,15 @@ export async function analyzeConversation(messages: Message[]): Promise<Partial<
     - ALWAYS use bullet points (•) for EVERY sentence in the text fields.
     - Keep bullet points concise.
     - Classify the sentiment of each section as "positive", "neutral", or "negative".
+    - IMPORTANT: When providing feedback, explicitly QUOTE the student's exact words from the transcript to provide concrete examples of what they did well or poorly. Use quotation marks for these references (e.g., "You said: '...'").
     
-    CRITICAL LEGAL CONTEXT:
+    CRITICAL LEGAL CONTEXT & ASSESSMENT CRITERIA:
     - The evaluation of legal concepts, issue addressing, and legal application MUST be strictly based on the laws of MALAYSIA.
     - DO NOT refer to or evaluate based on laws from other countries (e.g., US, UK, Australia) unless explicitly relevant to a comparative analysis requested by the client (which is rare).
+    - STRICT CITATION CHECK: You MUST verify if the student explicitly cited the relevant Malaysian statutes by name (e.g., "Copyright Act 1987", "Patents Act 1983").
+    - Do NOT assume the student knows or mentioned the law if they only gave general legal advice.
+    - If the student did not explicitly name the statute or explain the law in detail, you MUST point this out as a major area for improvement and deduct points.
+    - Only credit the student for legal application if they actually mention the law in detail and apply it correctly.
     
     Return a JSON object:
     - score: 0-40.

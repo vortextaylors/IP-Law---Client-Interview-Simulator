@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { 
   analyzeConversation, 
   getConvaiResponse, 
@@ -123,19 +123,6 @@ function App() {
     }
   }, [messages, analysisMetrics, isReviewMode]);
 
-  // Effect to handle Auto-Simulation Loop
-  useEffect(() => {
-    if (isAutoSimulating && loadingState === LoadingState.IDLE && messages.length > 0) {
-      const lastMsg = messages[messages.length - 1];
-      if (lastMsg.role === 'model') {
-        const timer = setTimeout(() => {
-          handleSimulateTurn();
-        }, 1500);
-        return () => clearTimeout(timer);
-      }
-    }
-  }, [isAutoSimulating, loadingState, messages]);
-
   const startScenario = (key: ScenarioKey) => {
     setActiveScenario(key);
     const randomPersona = STUDENT_PERSONAS[Math.floor(Math.random() * STUDENT_PERSONAS.length)];
@@ -257,7 +244,7 @@ ${analysisMetrics.summary}
     window.location.href = `mailto:?subject=${subject}&body=${body}`;
   };
 
-  const handleSendMessage = async (text: string) => {
+  const handleSendMessage = useCallback(async (text: string) => {
     const scenario = SCENARIOS[activeScenario];
     const userMessage: Message = {
       id: Date.now().toString(),
@@ -290,9 +277,9 @@ ${analysisMetrics.summary}
     } finally {
       setLoadingState(prev => prev === LoadingState.ERROR ? prev : LoadingState.IDLE);
     }
-  };
+  }, [activeScenario, sessionId]);
 
-  const handleSimulateTurn = async (persona: StudentPersona = activePersona) => {
+  const handleSimulateTurn = useCallback(async (persona: StudentPersona = activePersona) => {
     const scenario = SCENARIOS[activeScenario];
     setLoadingState(LoadingState.LOADING);
     try {
@@ -306,7 +293,7 @@ ${analysisMetrics.summary}
       setLoadingState(LoadingState.IDLE);
       setIsAutoSimulating(false);
     }
-  };
+  }, [activeScenario, messages, activePersona, handleSendMessage]);
 
   const toggleAutoSimulate = (persona?: StudentPersona) => {
     const nextState = !isAutoSimulating;
@@ -319,6 +306,19 @@ ${analysisMetrics.summary}
       }
     }
   };
+
+  // Effect to handle Auto-Simulation Loop
+  useEffect(() => {
+    if (isAutoSimulating && loadingState === LoadingState.IDLE && messages.length > 0) {
+      const lastMsg = messages[messages.length - 1];
+      if (lastMsg.role === 'model') {
+        const timer = setTimeout(() => {
+          handleSimulateTurn();
+        }, 1500);
+        return () => clearTimeout(timer);
+      }
+    }
+  }, [isAutoSimulating, loadingState, messages, handleSimulateTurn]);
 
   const handleFinish = async () => {
     setIsAnalyzing(true);

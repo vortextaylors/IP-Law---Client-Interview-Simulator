@@ -19,7 +19,6 @@ interface SidebarProps {
 const Sidebar: React.FC<SidebarProps> = ({ 
   sessionId, 
   characterName, 
-  characterId, 
   emotionState,
   topicName,
   onReturnToMenu,
